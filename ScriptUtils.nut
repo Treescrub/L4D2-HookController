@@ -1,6 +1,6 @@
 ::Utilities <- {
 	HookController = {}
-	EntityUtilities = {}
+	PlayerUtilities = {}
 }
 
 const PRINT_START = "Scripting Utilities: "
@@ -8,21 +8,27 @@ const PRINT_START = "Scripting Utilities: "
 ::SetupUtilities <- function(options = null){ // empty files will cause it to not include scripts
 	if(options != null){
 		if(typeof(options) == "array"){
-			local instances = {}
-			if(options.find("HookController") != null || options.find("hookcontroller") != null){
-				if(IncludeScript("Utilities/HookController.nut",Utilities.HookController)){
-					instances["HookController"] <- Utilities.HookController
+			foreach(string in options){
+				local instances = {}
+				if(typeof(string) == "string"){
+					if(string.tolower() == "hookcontroller"){
+						if(IncludeScript("Utilities/HookController.nut",Utilities.HookController)){
+							instances["HookController"] <- Utilities.HookController
+						} else {
+							instances["HookController"] <- null
+							printl(PRINT_START + "Could not include Hook Controller (Check that you have HookController.nut in the Utilities folder)")
+						}
+					}
+					if(string.tolower() == "playerutilities"){
+						if(IncludeScript("Utilities/PlayerUtilities.nut",Utilities.PlayerUtilities)){
+							instances["PlayerUtilities"] <- Utilities.PlayerUtilities
+						} else {
+							instances["PlayerUtilities"] <- null
+							printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
+						}
+					}
 				} else {
-					instances["HookController"] <- null
-					printl(PRINT_START + "Could not include Hook Controller (Check that you have HookController.nut in the Utilities folder)")
-				}
-			}
-			if(options.find("EntityUtilities") != null || options.find("entityutilities") != null){
-				if(IncludeScript("Utilities/EntityUtilities.nut",Utilities.EntityUtilities)){
-					instances["EntityUtilities"] <- Utilities.EntityUtilities
-				} else {
-					instances["EntityUtilities"] <- null
-					printl(PRINT_START + "Could not include Entity Utilities (Check that you have EntityUtilities.nut in the Utilities folder)")
+					printl(PRINT_START + " WARNING: An array element in options is not a string (" + string + " : " + typeof(string) + ")")
 				}
 			}
 			return instances
@@ -39,11 +45,11 @@ const PRINT_START = "Scripting Utilities: "
 			instances["HookController"] <- null
 			printl(PRINT_START + "Could not include Hook Controller (Check that you have HookController.nut in the Utilities folder)")
 		}
-		if(IncludeScript("Utilities/EntityUtilities.nut",Utilities.EntityUtilities)){
-			instances["EntityUtilities"] <- Utilities.EntityUtilities
+		if(IncludeScript("Utilities/PlayerUtilities.nut",Utilities.PlayerUtilities)){
+			instances["PlayerUtilities"] <- Utilities.PlayerUtilities
 		} else {
-			instances["EntityUtilities"] <- null
-			printl(PRINT_START + "Could not include Entity Utilities (Check that you have EntityUtilities.nut in the Utilities folder)")
+			instances["PlayerUtilities"] <- null
+			printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
 		}
 		return instances
 		printl("Scripting Utilities loaded. (Made by Daroot Leafstorm)")

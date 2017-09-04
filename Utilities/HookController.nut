@@ -1,7 +1,7 @@
 //make OnPickup and OnDrop
 //make sure the inputs for register functions are correct (correct type, etc)
 //fix the janky fix for populating the players array (Think)
-//make it so a user only has to include one script (with settings)
+//make most functions local
 
 /*options
 fire custom weapon while restricted (default is off)
@@ -328,7 +328,7 @@ class Task{
 
 
 
-function GetSurvivors()
+local function GetSurvivors()
 {
 	local t = {};
 	local ent = null;
@@ -346,7 +346,7 @@ function GetSurvivors()
 	return t;
 }
 
-function FindCustomOptions(currentTable)
+local function FindCustomOptions(currentTable) // make it so users just call something like this directly?
 {
 	if("CustomWeaponOptions" in currentTable && typeof(currentTable.CustomWeaponOptions) == "table"){
 		return currentTable.CustomWeaponOptions
@@ -364,14 +364,23 @@ function FindCustomOptions(currentTable)
 	return null
 }
 
-function SetCustomOptions(){ // TODO do this stuff
+local function SetCustomOptions(){ // TODO do this stuff
 	local options = FindCustomOptions(getroottable())
 	if(options != null){
 		
 	}
 }
 
-function FindCustomWeapon(weaponmodel){ // make this so it won't break really easy
+local function FindPlayerObject(playerId){
+	foreach(player in players){
+		if(player.GetId() == playerId){
+			return player
+		}
+	}
+	return null
+}
+
+local function FindCustomWeapon(weaponmodel){ // make this so it won't break really easy
 	foreach(weapon in custom_weapons){
 		if(weapon.GetModel() == weaponmodel){
 			return weapon
@@ -380,7 +389,7 @@ function FindCustomWeapon(weaponmodel){ // make this so it won't break really ea
 	return null
 }
 
-function CallFunction(scope,funcName,ent){
+local function CallFunction(scope,funcName,ent){
 	if(funcName in scope && typeof(scope[funcName]) == "function"){
 		if(ent != null){
 			try{
@@ -394,7 +403,7 @@ function CallFunction(scope,funcName,ent){
 	}
 }
 
-function HandleCallback(scope, weaponmodel, player){ // scope = scope of custom weapon, model = model of current weapon
+local function HandleCallback(scope, weaponmodel, player){ // scope = scope of custom weapon, model = model of current weapon
 	if("model" in player.GetLastWeapon() && player.GetLastWeapon().model != weaponmodel){ //we changed weapons!
 		if(player.GetLastWeapon().scope != null){
 			CallFunction(player.GetLastWeapon().scope,"OnUnequipped",player.GetEntity())
@@ -657,7 +666,6 @@ function HandleCallback(scope, weaponmodel, player){ // scope = scope of custom 
 	}
 }
 
-local printtime = 0
 function Think(){
 	foreach(task in tasks){
 		if(Time() >= task.GetEndTime()){
@@ -736,14 +744,6 @@ function Think(){
 }
 
 
-function FindPlayerObject(playerId){
-	foreach(player in players){
-		if(player.GetId() == playerId){
-			return player
-		}
-	}
-	return null
-}
 
 function RegisterCustomWeapon(viewModel, scriptName){
 	local failed = "Failed to register a custom weapon script "
@@ -873,6 +873,8 @@ function ScheduleTask(func, time, scope = null){ // can only check every 33 mill
 	}
 	return false
 }
+
+
 
 function OnGameEvent_tongue_grab(params)
 {
