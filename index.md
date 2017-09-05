@@ -1,5 +1,5 @@
 ---
-title: ScriptUtils | Useful L4D2 scripting functions
+title: 
 ---
 
 ## Welcome to GitHub Pages
