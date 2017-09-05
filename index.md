@@ -11,8 +11,12 @@ ScriptUtils has many useful features for scripting, the current ones are:
 
 # How to Use
 
-Download the [ZIP](https://github.com/Treescrub/ScriptUtils/archive/master.zip) and extract into your VScripts folder.
+Download the [ZIP](https://github.com/Treescrub/ScriptUtils/archive/master.zip) and extract it into your VScripts folder.
 
+Then, in your mode VScript, include this portion:
+```Squirrel
+IncludeScript("ScriptUtils")
+```
 
 ### Markdown
 
