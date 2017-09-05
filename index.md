@@ -1,5 +1,5 @@
 ---
-title: Kappa
+title: ScriptUtils | Useful L4D2 scripting functions
 ---
 
 ## Welcome to GitHub Pages
