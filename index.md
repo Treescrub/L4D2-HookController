@@ -1,6 +1,5 @@
 ---
-title: ScriptUtils
-excerpt: wot
+title: Scripting Utils
 ---
 
 ## Welcome to GitHub Pages
