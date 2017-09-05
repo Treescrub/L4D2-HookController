@@ -20,7 +20,7 @@ Syntax highlighted code block
 
 [Link](url) and ![Image](src)
 ```
-[![](button.png)](http://reddit.com)
+[![](button2.png)](http://reddit.com)
 # Header 1
 ## Header 2
 ### Header 3
