@@ -1,6 +1,5 @@
 ---
 title: ScriptUtils
-description: lul
 ---
 
 ## Welcome to GitHub Pages
