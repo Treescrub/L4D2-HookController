@@ -5,9 +5,9 @@ title: ScriptUtils
 # Features
 ScriptUtils has many useful features for scripting, the current ones are:
 
-- Hook Controller \- Can register custom weapons, schedule tasks, and listen for entities being created.
-- Player Utilities \- Functions for CTerrorPlayer entities, mostly functions for NetProp setting.
-- NetProp Helper \- Keeps track of changes in network properties based on commands entered in chat or in a script.
+- **Hook Controller** \- Can register custom weapons, schedule tasks, and listen for entities being created.
+- **Player Utilities** \- Functions for CTerrorPlayer entities, mostly functions for NetProp setting.
+- **NetProp Helper** \- Keeps track of changes in network properties based on commands entered in chat or in a script.
 
 
 ### Markdown
