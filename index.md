@@ -11,7 +11,7 @@ ScriptUtils has many useful features for scripting, the current ones are:
 
 # How to Use
 
-Git gud
+Download the [ZIP](https://github.com/Treescrub/ScriptUtils/archives/master.zip) and extract into your VScripts folder.
 
 
 ### Markdown
