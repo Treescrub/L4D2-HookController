@@ -1,2 +1,2 @@
 ## GetScriptUtilsHandles
-![](images/GetScriptUtilsHandles.png)
+![k](/images/GetScriptUtilsHandles.png)
