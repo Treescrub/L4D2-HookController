@@ -33,8 +33,11 @@ local hookcontroller = GetScriptUtilsHandles().GetHookController()
 SetupUtilities(...)
 ```
 Takes any number of inputs.
+
 Use no arguments to load all modules.
+
 All arguments must be strings and are the name of the modules.
+
 Returns a [Utilities](#utilities) instance.
 
 **Example**
