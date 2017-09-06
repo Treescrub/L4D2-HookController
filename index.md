@@ -22,9 +22,14 @@ To set up modules and get handles.
 SetupUtilities()
 ```
 This will return a table of the module scopes.
-Find documentation [here](docs/scriptutils.md#SetupUtilities)
+Find documentation for SetupUtilities [here](docs/scriptutils.md#SetupUtilities).
 
-### Markdown
+# Documentation
+
+
+
+# Examples
+
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
