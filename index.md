@@ -22,7 +22,7 @@ To set up modules and get handles.
 SetupUtilities()
 ```
 This will return a table of the module scopes.
-Find documentation [here](index.md#markdown)
+Find documentation [here](#markdown)
 
 ### Markdown
 
