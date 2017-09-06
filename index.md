@@ -17,6 +17,12 @@ Then include the script.
 ```c++
 IncludeScript("ScriptUtils")
 ```
+To set up modules and get handles.
+```c++
+SetupUtilities()
+```
+This will return a table of the module scopes.
+Find documentation [here](index.md/#Markdown)
 
 ### Markdown
 
