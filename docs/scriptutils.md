@@ -7,11 +7,11 @@
 ```c++
 GetHookController()
 ```
-Returns the scope of a HookController module.
+Returns the scope of a [HookController](hookcontroller.md) module.
 ```c++
 GetPlayerUtilities()
 ```
-Returns the scope of a PlayerUtilities module.
+Returns the scope of a [PlayerUtilities](playerutilities.md) module.
 
 # Functions
 
