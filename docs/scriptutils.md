@@ -20,9 +20,24 @@ Returns the scope of a PlayerUtilities module.
 ```c++
 GetScriptUtilsHandles()
 ```
-Returns a [Utilities](#Utilities) instance. Will not be filled out if [SetupUtilities](#SetupUtilities) has not been called yet.
+Returns a [Utilities](#utilities) instance. Will not be filled out if [SetupUtilities](#SetupUtilities) has not been called yet.
 
 **Example**
 ```c++
 local hookcontroller = GetScriptUtilsHandles().GetHookController()
 ```
+
+## SetupUtilities
+
+
+
+
+
+
+
+
+
+
+
+
+k
