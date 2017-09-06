@@ -19,7 +19,7 @@ GetPlayerUtilities()
 GetScriptUtilsHandles()
 ```
 
-Returns . Will not be filled out if [SetupUtilities](#SetupUtilities) has not been called yet.
+Returns a Utilities instance. Will not be filled out if [SetupUtilities](#SetupUtilities) has not been called yet.
 
 **Example**
 ```c++
