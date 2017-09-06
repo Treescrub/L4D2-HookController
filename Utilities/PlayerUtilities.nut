@@ -1,38 +1,52 @@
-function SetNightvision(player, nightvisionOn){
-	if(player != null && player.IsValid() && "player" == player.GetClassname().tolower() && nightvisionOn != null && typeof(nightvisionOn) == "bool"){
-		if(nightvisionOn){
+// make a class (so users don't have to constantly call Utilities.PlayerUtilities.Function())
+
+local function IsPlayer(ent){
+	if(ent != null && ent.IsValid() && ent.GetClassname().tolower() == "player"){
+		return true
+	} else {
+		return false
+	}
+}
+
+local function TogglePropBoolean(ent, flag){
+	if(ent != null && typeof(ent) == "instance" && ent.IsValid() && flag != null && typeof(flag) == "string"){
+		local value = NetProps.GetPropInt(ent,flag)
+		if(value == 0){
+			NetProps.SetPropInt(ent,flag,1)
+		} else if(value == 1){
+			NetProps.SetPropInt(ent,flag,0)
+		}
+	}
+}
+
+function SetNightvision(player, bool){
+	if(IsPlayer(player) && bool != null && typeof(bool) == "bool"){
+		if(bool){
 			NetProps.SetPropInt(player,"m_bNightVisionOn",1)
 		} else {
 			NetProps.SetPropInt(player,"m_bNightVisionOn",0)
 		}
-		return true
-	} else {
-		return false
 	}
 }
 
 function ToggleNightvision(player){
-	if(player != null && player.IsValid() && "player" == player.GetClassname().tolower()){
-		if(NetProps.GetPropInt(player,"m_bNightVisionOn") == 1){
-			NetProps.SetPropInt(player,"m_bNightVisionOn",0)
-		} else {
-			NetProps.SetPropInt(player,"m_bNightVisionOn",1)
-		}
-		return true
-	} else {
-		return false
+	if(IsPlayer(player)){
+		TogglePropBoolean(player,"m_bNightVisionOn")
 	}
 }
 
 function SetIncapacitated(player, bool){
-	if(player != null && player.IsValid() && "player" == player.GetClassname().tolower() && typeof(bool) == "bool"){
+	if(IsPlayer(player) && typeof(bool) == "bool"){
 		if(bool){
 			NetProps.SetPropInt(player,"m_isIncapacitated",1)
 		} else {
 			NetProps.SetPropInt(player,"m_isIncapacitated",0)
 		}
-		return true
-	} else {
-		return false
+	}
+}
+
+function ToggleIncapacitated(player){
+	if(IsPlayer(player)){
+		TogglePropBoolean(player, "m_isIncapacitated")
 	}
 }
