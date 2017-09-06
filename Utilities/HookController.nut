@@ -695,6 +695,7 @@ function Think(){
 			ent_array.sort(@(a,b) a.GetEntityIndex() <=> b.GetEntityIndex())
 			local new_ents = ent_array.slice(listener.GetLastEntities().len())
 			foreach(new_ent in new_ents){
+				printl("OnEntCreate_"+listener.GetClassname())
 				CallFunction(listener.GetScope(),"OnEntCreate_"+listener.GetClassname(),new_ent)
 			}
 		}
