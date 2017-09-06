@@ -7,9 +7,11 @@
 ```c++
 GetHookController()
 ```
+Returns the scope of a HookController module.
 ```c++
 GetPlayerUtilities()
 ```
+Returns the scope of a PlayerUtilities module.
 
 # Functions
 
@@ -18,10 +20,9 @@ GetPlayerUtilities()
 ```c++
 GetScriptUtilsHandles()
 ```
-
 Returns a Utilities instance. Will not be filled out if [SetupUtilities](#SetupUtilities) has not been called yet.
 
 **Example**
 ```c++
-local hookcontroller = GetScriptUtilsHandles().
+local hookcontroller = GetScriptUtilsHandles().GetHookController()
 ```
