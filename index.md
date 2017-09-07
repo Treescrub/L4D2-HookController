@@ -24,11 +24,8 @@ SetupUtilities()
 This will return a table of the module scopes.
 Find documentation for SetupUtilities [here](docs/scriptutils.md#SetupUtilities).
 
-# Documentation
-
-
-
 # Examples
+
 
 
 Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
