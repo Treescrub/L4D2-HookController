@@ -1,5 +1,3 @@
-// make a class (so users don't have to constantly call Utilities.PlayerUtilities.Function())
-
 local function IsPlayer(ent){
 	if(ent != null && ent.IsValid() && ent.GetClassname().tolower() == "player"){
 		return true
@@ -50,3 +48,25 @@ function ToggleIncapacitated(player){
 		TogglePropBoolean(player, "m_isIncapacitated")
 	}
 }
+
+function SetNoclipping(player,bool){
+	if(IsPlayer(player) && typeof(bool) == "bool"){
+		if(bool){
+			NetProps.SetPropInt( player, "movetype", 8)
+		} else {
+			NetProps.SetPropInt( player, "movetype", 2)
+		}
+	}
+}
+
+function ToggleNoclipping(player){
+	if(IsPlayer(player)){
+		local val = NetProps.GetPropInt(player,"movetype")
+		if(val != 8){
+			NetProps.SetPropInt( player, "movetype", 8)
+		} else {
+			NetProps.SetPropInt( player, "movetype", 2)
+		}
+	}
+}
+

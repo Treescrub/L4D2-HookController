@@ -15,26 +15,35 @@ class Utilities{
 		playerutilities = handle
 	}
 	
+	function SetNetPropHelper(handle){
+		netprophelper = handle
+	}
+	
+	function GetNetPropHelper(){
+		return netprophelper
+	}
+	
+	netprophelper = null
 	hookcontroller = null
 	playerutilities = null
 }
 
-ScriptUtils <- {
+::ScriptUtils <- {
+	SetupComplete = false
+	UtilitiesInstance = null
 	HookController = {}
 	PlayerUtilities = {}
+	NetPropHelper = {}
 }
 
 const PRINT_START = "Scripting Utilities: "
 
-setup_complete <- false
-utilities <- null
-
 ::GetScriptUtilsHandles <- function(){
-	return utilities
+	return ScriptUtils.UtilitiesInstance
 }
 
 ::SetupUtilities <- function(...){ // empty files will cause it to not include scripts
-	if(!setup_complete){
+	if(!ScriptUtils.SetupComplete){
 		if(vargv.len() >= 1){
 			if(typeof(vargv) == "array"){
 				local utils = Utilities()
@@ -56,12 +65,20 @@ utilities <- null
 								printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
 							}
 						}
+						if(string.tolower() == "netprophelper"){
+							if(IncludeScript("Utilities/NetPropHelper.nut",ScriptUtils.NetPropHelper)){
+								utils.SetNetPropHelper(ScriptUtils.NetPropHelper)
+							} else {
+								utils.SetNetPropHelper(null)
+								printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
+							}
+						}
 					} else {
 						printl(PRINT_START + " WARNING: An array element in options is not a string (" + string + " : " + typeof(string) + ")")
 					}
 				}
 				printl("Scripting Utilities loaded. (Made by Daroot Leafstorm)")
-				utilities = utils
+				ScriptUtils.UtilitiesInstance = utils
 				return utils
 			} else {
 				printl(PRINT_START + "Failed to load Scripting Utilities (The options parameter must be an array)")
@@ -75,13 +92,21 @@ utilities <- null
 				utils.SetHookController(null)
 				printl(PRINT_START + "Could not include Hook Controller (Check that you have HookController.nut in the Utilities folder)")
 			}
+			
 			if(IncludeScript("Utilities/PlayerUtilities.nut",ScriptUtils.PlayerUtilities)){
 				utils.SetPlayerUtilities(ScriptUtils.PlayerUtilities)
 			} else {
 				utils.SetPlayerUtilities(null)
 				printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
 			}
-			utilities = utils
+			
+			if(IncludeScript("Utilities/NetPropHelper.nut",ScriptUtils.NetPropHelper)){
+				utils.SetNetPropHelper(ScriptUtils.NetPropHelper)
+			} else {
+				utils.SetNetPropHelper(null)
+				printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
+			}
+			ScriptUtils.UtilitiesInstance = utils
 			printl("Scripting Utilities loaded. (Made by Daroot Leafstorm)")
 			return utils
 		}

@@ -1,7 +1,7 @@
-//make OnPickup and OnDrop
+//test OnPickup and OnDrop
 //make sure the inputs for register functions are correct (correct type, etc)
-//fix the janky fix for populating the players array (Think)
-//make most functions local
+//make CallFunction take a player activator parameter
+//make OnEquipped and OnUnequipped for non-custom weapons?
 
 /*options
 fire custom weapon while restricted (default is off)
@@ -11,7 +11,7 @@ print debug info (default is on)
 
 
 local custom_weapons = []
-local key_listeners = []
+local hook_scripts = []
 local ent_move_listeners = []
 local ent_create_listeners = []
 local players = []
@@ -23,9 +23,7 @@ local debugPrint = true
 local timer = SpawnEntityFromTable("logic_timer",{RefireTime = 0.01})
 timer.ValidateScriptScope()
 timer.GetScriptScope()["func"] <- function(){
-	if("Utilities" in getroottable()){
-		getroottable().Utilities.HookController.Think()
-	}
+	ScriptUtils.HookController.Think()
 }
 timer.ConnectOutput("OnTimer", "func")
 EntFire("!self","Enable",null,0,timer)
@@ -197,8 +195,8 @@ class Player {
 	}
 	
 	
-	function SetLastWeapon(table){
-		lastweapon = table
+	function SetLastWeapon(ent){
+		lastweapon = ent
 	}
 	
 	function GetLastWeaponsArray(){
@@ -229,20 +227,26 @@ class Player {
 }
 
 class CustomWeapon {
-	constructor(viewmodel, scriptScope){
-		model = viewmodel
-		scope = scriptScope
+	constructor(vmodel, wmodel, scriptscope){
+		viewmodel = vmodel
+		worldmodel = wmodel
+		scope = scriptscope
 	}
 	
-	function GetModel(){
-		return model
+	function GetViewModel(){
+		return viewmodel
+	}
+	
+	function GetWorldModel(){
+		return worldmodel
 	}
 	
 	function GetScope(){
 		return scope
 	}
 	
-	model = null
+	viewmodel = null
+	worldmodel = null
 	scope = null
 }
 
@@ -382,7 +386,7 @@ local function FindPlayerObject(playerId){
 
 local function FindCustomWeapon(weaponmodel){ // make this so it won't break really easy
 	foreach(weapon in custom_weapons){
-		if(weapon.GetModel() == weaponmodel){
+		if(weapon.GetViewModel() == weaponmodel){
 			return weapon
 		}
 	}
@@ -390,7 +394,7 @@ local function FindCustomWeapon(weaponmodel){ // make this so it won't break rea
 }
 
 local function CallFunction(scope,funcName,ent){
-	if(funcName in scope && typeof(scope[funcName]) == "function"){
+	if(scope != null && funcName in scope && typeof(scope[funcName]) == "function"){
 		if(ent != null){
 			try{
 				scope[funcName](ent)
@@ -404,31 +408,33 @@ local function CallFunction(scope,funcName,ent){
 }
 
 local function HandleCallback(scope, weaponmodel, player){ // scope = scope of custom weapon, model = model of current weapon
-	if("model" in player.GetLastWeapon() && player.GetLastWeapon().model != weaponmodel){ //we changed weapons!
-		if(player.GetLastWeapon().scope != null){
-			CallFunction(player.GetLastWeapon().scope,"OnUnequipped",player.GetEntity())
-		} else if(FindCustomWeapon(weaponmodel) != null) {
-			CallFunction(scope,"OnEquipped",player.GetEntity())
+	if(player.GetLastWeapon() != null && NetProps.GetPropString(player.GetLastWeapon(), "m_ModelName") != weaponmodel){ //we changed weapons!
+		foreach(weapon in custom_weapons){
+			if(NetProps.GetPropString(player.GetLastWeapon(), "m_ModelName") == weapon.GetViewModel()){
+				CallFunction(weapon.GetScope(),"OnUnequipped",player.GetEntity())
+			} else if(weaponmodel == weapon.GetViewModel()){
+				CallFunction(weapon.GetScope(),"OnEquipped",player.GetEntity())
+			}
 		}
 	}
 	
 	
 	if(player.GetButtonMask() & ATTACK){
 		if(player.GetAttack()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnAttackTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnAttackTick",player.GetEntity())
 		} else {
 			player.SetAttack(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnAttackStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnAttackStart",player.GetEntity())
 		}
 	} else if(player.GetAttack()){
 		player.SetAttack(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnAttackEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnAttackEnd",player.GetEntity())
@@ -436,20 +442,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & ATTACK2){ // will act weirdly and will start on shove start, and end when the weapon returns to the normal position
 		if(player.GetAttack2()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnAttack2Tick",player.GetEntity())
 			}
 			CallFunction(scope,"OnAttack2Tick",player.GetEntity())
 		} else {
 			player.SetAttack2(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnAttack2Start",player.GetEntity())
 			}
 			CallFunction(scope,"OnAttack2Start",player.GetEntity())
 		}
 	} else if(player.GetAttack2()){
 		player.SetAttack2(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnAttack2End",player.GetEntity())
 		}
 		CallFunction(scope,"OnAttack2End",player.GetEntity())
@@ -457,20 +463,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & CROUCH){
 		if(player.GetCrouch()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnCrouchTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnCrouchTick",player.GetEntity())
 		} else {
 			player.SetCrouch(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnCrouchStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnCrouchStart",player.GetEntity())
 		}
 	} else if(player.GetCrouch()){
 		player.SetCrouch(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnCrouchEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnCrouchEnd",player.GetEntity())
@@ -478,20 +484,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & LEFT){
 		if(player.GetLeft()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnLeftTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnLeftTick",player.GetEntity())
 		} else {
 			player.SetLeft(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnLeftStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnLeftStart",player.GetEntity())
 		}
 	} else if(player.GetLeft()){
 		player.SetLeft(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnLeftEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnLeftEnd",player.GetEntity())
@@ -499,20 +505,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & RIGHT){
 		if(player.GetRight()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnRightTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnRightTick",player.GetEntity())
 		} else {
 			player.SetRight(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnRightStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnRightStart",player.GetEntity())
 		}
 	} else if(player.GetRight()){
 		player.SetRight(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnRightEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnRightEnd",player.GetEntity())
@@ -520,20 +526,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & FORWARD){
 		if(player.GetForward()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnForwardTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnForwardTick",player.GetEntity())
 		} else {
 			player.SetForward(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnForwardStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnForwardStart",player.GetEntity())
 		}
 	} else if(player.GetForward()){
 		player.SetForward(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnForwardEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnForwardEnd",player.GetEntity())
@@ -541,20 +547,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & BACKWARD){
 		if(player.GetBackward()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnBackwardTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnBackwardTick",player.GetEntity())
 		} else {
 			player.SetBackward(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnBackwardStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnBackwardStart",player.GetEntity())
 		}
 	} else if(player.GetBackward()){
 		player.SetBackward(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnBackwardEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnBackwardEnd",player.GetEntity())
@@ -562,20 +568,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & USE){
 		if(player.GetUse()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnUseTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnUseTick",player.GetEntity())
 		} else {
 			player.SetUse(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnUseStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnUseStart",player.GetEntity())
 		}
 	} else if(player.GetUse()){
 		player.SetUse(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnUseEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnUseEnd",player.GetEntity())
@@ -583,20 +589,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & RELOAD){
 		if(player.GetReload()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnReloadTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnReloadTick",player.GetEntity())
 		} else {
 			player.SetReload(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnReloadStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnReloadStart",player.GetEntity())
 		}
 	} else if(player.GetReload()){
 		player.SetReload(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnReloadEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnReloadEnd",player.GetEntity())
@@ -604,20 +610,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & WALK){
 		if(player.GetWalk()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnWalkTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnWalkTick",player.GetEntity())
 		} else {
 			player.SetWalk(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnWalkStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnWalkStart",player.GetEntity())
 		}
 	} else if(player.GetWalk()){
 		player.SetWalk(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnWalkEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnWalkEnd",player.GetEntity())
@@ -625,20 +631,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & ZOOM){
 		if(player.GetZoom()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnZoomTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnZoomTick",player.GetEntity())
 		} else {
 			player.SetZoom(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnZoomStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnZoomStart",player.GetEntity())
 		}
 	} else if(player.GetZoom()){
 		player.SetZoom(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnZoomEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnZoomEnd",player.GetEntity())
@@ -646,20 +652,20 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 	
 	if(player.GetButtonMask() & JUMP){
 		if(player.GetJump()){
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnJumpTick",player.GetEntity())
 			}
 			CallFunction(scope,"OnJumpTick",player.GetEntity())
 		} else {
 			player.SetJump(true)
-			foreach(script in key_listeners){
+			foreach(script in hook_scripts){
 				CallFunction(script,"OnJumpStart",player.GetEntity())
 			}
 			CallFunction(scope,"OnJumpStart",player.GetEntity())
 		}
 	} else if(player.GetJump()){
 		player.SetJump(false)
-		foreach(script in key_listeners){
+		foreach(script in hook_scripts){
 			CallFunction(script,"OnJumpEnd",player.GetEntity())
 		}
 		CallFunction(scope,"OnJumpEnd",player.GetEntity())
@@ -701,7 +707,7 @@ function Think(){
 		}
 		listener.SetLastEntities(ent_array)
 	}
-	foreach(script in key_listeners){
+	foreach(script in hook_scripts){
 		CallFunction(script,"OnTick",null)
 	}
 	if(players.len() == 0){
@@ -718,26 +724,77 @@ function Think(){
 				local custom_weapon = FindCustomWeapon(weaponmodel)
 				if(custom_weapon != null){
 					HandleCallback(custom_weapon.GetScope(),weaponmodel,player)
-					player.SetLastWeapon({model = weaponmodel, scope = custom_weapon.GetScope()})
+					player.SetLastWeapon(player.GetEntity().GetActiveWeapon())
 				} else {
 					HandleCallback(null,weaponmodel,player)
-					player.SetLastWeapon({model = weaponmodel, scope = null})
+					player.SetLastWeapon(player.GetEntity().GetActiveWeapon())
 				}
 				
 		
 				local current_weapons = []
+				local new_weapons = []
+				local dropped_weapons = []
+				
 				local inventory_index = 0
 				local item = null
 				
-				while((item = NetProps.GetPropEntityArray(player.GetEntity(), "m_hMyWeapons", inventory_index)) != null){
-					current_weapons.append(item)
+				while(inventory_index < 5){
+					item = NetProps.GetPropEntityArray(player.GetEntity(), "m_hMyWeapons", inventory_index)
+					if(item != null){
+						current_weapons.append(item)
+						new_weapons.append(item)
+					}
 					inventory_index += 1
 				}
 				
-				// for each custom weapon, check if contained in last_weapons, check if contained in current_weapon
-				foreach(weapon in custom_weapons){ // assume on spawn that inventory hasn't changed?
-					
+				if(player.GetLastWeaponsArray() == null){
+					player.SetLastWeaponsArray(current_weapons)
 				}
+				
+				foreach(old_weapon in player.GetLastWeaponsArray()){
+					dropped_weapons.append(old_weapon)
+				}
+				
+				for(local i=0;i < dropped_weapons.len();i+=1){
+					for(local j=0;j < new_weapons.len();j+=1){
+						if(dropped_weapons != null && i < dropped_weapons.len() && dropped_weapons[i] != null){
+							if(new_weapons[j].GetEntityIndex() == dropped_weapons[i].GetEntityIndex()){
+								new_weapons.remove(j)
+								dropped_weapons.remove(i)
+								if(i != 0){
+									i -= 1
+								}
+								j -= 1
+							}
+						}
+					}
+				}
+				
+				if(new_weapons.len() > 0) {
+					foreach(ent in new_weapons){
+						foreach(weapon in custom_weapons){
+							if(NetProps.GetPropString(ent, "m_ModelName") == weapon.GetViewModel()){
+								CallFunction(weapon.GetScope(),"OnPickup",ent)
+							}
+						}
+						/*foreach(scope in hook_scripts){
+							CallFunction(scope,"OnPickup_" + ent.GetClassname(),ent)
+						}*/
+					}
+				}
+				if(dropped_weapons.len() > 0){
+					foreach(ent in dropped_weapons){
+						foreach(weapon in custom_weapons){
+							if(NetProps.GetPropString(ent, "m_ModelName") == weapon.GetWorldModel()){
+								CallFunction(weapon.GetScope(),"OnDrop",ent)
+							}
+						}
+						/*foreach(scope in hook_scripts){
+							CallFunction(scope,"OnDrop_" + ent.GetClassname(),ent)
+						}*/
+					}
+				}
+
 				player.SetLastWeaponsArray(current_weapons)
 			}
 		}
@@ -746,10 +803,10 @@ function Think(){
 
 
 
-function RegisterCustomWeapon(viewModel, scriptName){
+function RegisterCustomWeapon(viewmodel, worldmodel, scriptName){
 	local failed = "Failed to register a custom weapon script "
-	if(viewModel != null && scriptName != null){
-		if(typeof(viewModel) == "string"){
+	if(viewmodel != null && worldmodel != null && scriptName != null){
+		if(typeof(viewmodel) == "string" && typeof(worldmodel) == "string"){
 			local scriptScope = {}
 			if(!IncludeScript(scriptName, scriptScope)){
 				if(debugPrint){
@@ -757,33 +814,36 @@ function RegisterCustomWeapon(viewModel, scriptName){
 				}
 				return false
 			}
-			if(viewModel.slice(viewModel.len()-4) != ".mdl"){
-				viewModel = viewModel + ".mdl"
+			if(viewmodel.slice(viewmodel.len()-4) != ".mdl"){
+				viewmodel = viewmodel + ".mdl"
 			}
-			custom_weapons.append(CustomWeapon(viewModel,scriptScope))
+			if(worldmodel.slice(worldmodel.len()-4) != ".mdl"){
+				worldmodel = worldmodel + ".mdl"
+			}
+			custom_weapons.append(CustomWeapon(viewmodel,worldmodel,scriptScope))
 			if("OnInitialize" in scriptScope){
 				scriptScope["OnInitialize"]()
 			}
 			if(debugPrint){
-				printl(PRINT_START + "Registered custom weapon script " + scriptName + " with viewmodel " + viewModel)
+				printl(PRINT_START + "Registered custom weapon script " + scriptName)
 			}
 			return true
 		} else {
 			if(debugPrint){
-				printl(PRINT_START + failed + "(Viewmodel is not a string)")
+				printl(PRINT_START + failed + "(Viewmodel or worldmodel is not a string)")
 			}
 			return false
 		}
 	}
 	if(debugPrint){
-		printl(PRINT_START + failed + "(Viewmodel or scriptname is null)")
+		printl(PRINT_START + failed + "(Viewmodel, worldmodel, or scriptname is null)")
 	}
 	return false
 }
 
-function RegisterKeyListener(scriptScope){ //basically listens for keypresses and calls hooks
+function RegisterHooks(scriptScope){ //basically listens for keypresses and calls hooks
 	if(scriptScope != null){
-		key_listeners.append(scriptScope)
+		hook_scripts.append(scriptScope)
 		if(debugPrint){
 			printl(PRINT_START + "Registered key listener")
 		}
