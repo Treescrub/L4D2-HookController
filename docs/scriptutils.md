@@ -1,6 +1,7 @@
 ---
 title: ScriptUtils
 ---
+<var>Kappa</var>
 
 # Classes
 
