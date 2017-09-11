@@ -15,11 +15,11 @@ title: ScriptUtils
 ```c++
 GetHookController()
 ```
-Returns the scope of a [HookController](hookcontroller.md) module.
+  Returns the scope of a [HookController](hookcontroller.md) module.
 ```c++
 GetPlayerUtilities()
 ```
-Returns the scope of a [PlayerUtilities](playerutilities.md) module.
+  Returns the scope of a [PlayerUtilities](playerutilities.md) module.
 
 # Functions
 
@@ -28,7 +28,7 @@ Returns the scope of a [PlayerUtilities](playerutilities.md) module.
 ```c++
 GetScriptUtilsHandles()
 ```
-Returns a [Utilities](#utilities) instance. Will not be filled out if [SetupUtilities](#setuputilities) has not been called yet.
+  Returns a [Utilities](#utilities) instance. Will not be filled out if [SetupUtilities](#setuputilities) has not been called yet.
 
 **Example**
 ```c++
@@ -40,13 +40,13 @@ local hookcontroller = GetScriptUtilsHandles().GetHookController()
 ```c++
 SetupUtilities(...)
 ```
-Takes any number of inputs.
+  Takes any number of inputs.
 
-Use no arguments to load all modules.
+  Use no arguments to load all modules.
 
-All arguments must be strings and are the name of the modules.
+  All arguments must be strings and are the name of the modules.
 
-Returns a [Utilities](#utilities) instance.
+  Returns a [Utilities](#utilities) instance.
 
 **Example**
 ```c++
