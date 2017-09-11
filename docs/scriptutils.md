@@ -4,7 +4,11 @@ title: ScriptUtils
 
 # Classes
 
+---
+
 ## Utilities
+
+---
 
 ### Class Functions
 
