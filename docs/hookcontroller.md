@@ -48,7 +48,7 @@ Register a custom weapon and include the weapon script.
 </div>
 
 **X** can be `Start`, `Tick`, or `End`
-Called when a custom weapon entity is held and **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed, depending on **X**.
+Called when a custom weapon entity is held and **Y** (the key name) starts being pressed, every tick while being pressed, or released, depending on **X**.
 
 #### OnUnequipped
 
@@ -96,8 +96,8 @@ Register hooks to a script scope.
 
 | Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
-| ent | entity | Entity handle of the custom weapon |
-| player | entity | Player that pressed the key, may be null |
+| ent | entity | Entity handle of the player's active weapon |
+| player | entity | Player that pressed the key |
 
 **List of key names**:
 * Attack
@@ -120,7 +120,7 @@ Register hooks to a script scope.
 </div>
 
 **X** can be `Start`, `Tick`, or `End`
-Called when **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed by a player, depending on **X**.
+Called when a player starts pressing, every tick while pressing, or releasing **Y** (the key name), depending on **X**.
 
 
 ---
@@ -137,6 +137,20 @@ Listens for new entities by classname.
 | | |
 | *return* | boolean | If registering was successful |
 
+### Callback Functions
+
+#### OnEntCreate_X
+
+```c++
+OnEntCreate_X(ent)
+```
+
+**X** is the classname of the entity.
+| Parameter      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| ent | entity | Entity that was just created |
+
+
 ---
 ## RegisterEntityMoveListener
 <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>RegisterEntityMoveListener</b></span><span class="p">(</span><span style="color:salmon">ent</span><span class="p">,</span><span style="color:salmon">scope</span><span class="p">)</span>
@@ -150,6 +164,19 @@ Listens for a specific entity moving.
 | scope | table | Scope in which callbacks will be called |
 | | |
 | *return* | boolean | If registering was successful |
+
+### Callback Functions
+
+#### OnEntityMove
+
+```c++
+OnEntityMove(ent)
+```
+Called when an entity that has been registered has moved.
+
+| Parameter      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| ent | entity | Entity that just moved |
 
 ---
 ## ScheduleTask
