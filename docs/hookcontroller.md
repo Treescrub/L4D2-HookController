@@ -38,6 +38,7 @@ Register hooks to a script scope.
 RegisterEntityCreateListener(classname, scope)
 ```
 Listens for new entities by classname.
+
 | Variable      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
 | classname | string |  Classname of the entity |
