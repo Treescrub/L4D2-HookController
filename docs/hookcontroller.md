@@ -62,7 +62,7 @@ Listens for a specific entity moving.
 
 ---
 ## ScheduleTask
-<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>ScheduleTask</b></span><span class="p">(</span><span style="color:salmon">func</span><span class="p">,</span> <span style="color:salmon">time</span><span class="p">,</span> <span style="color:salmon">scope</span> <span class="o">=</span> <span class="n">null</span><span class="p">)</span>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>ScheduleTask</b></span><span class="p">(</span><span style="color:salmon">func</span><span class="p">,</span> <span style="color:salmon">time</span><span class="p">,</span> <span style="color:salmon">scope</span> <span class="o">=</span> <span style="color:steelblue">null</span><span class="p">)</span>
 </code></pre>
 </div>
 Schedules a function to execute at a specific time.
