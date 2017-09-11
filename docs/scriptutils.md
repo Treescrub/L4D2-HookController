@@ -1,7 +1,8 @@
 ---
 title: ScriptUtils
 ---
-<var>Kappa</var>
+
+<param>kappapride</param>
 
 # Classes
 
