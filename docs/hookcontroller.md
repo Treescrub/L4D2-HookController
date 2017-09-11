@@ -21,9 +21,9 @@ Register a custom weapon and include the weapon script.
 
 ---
 ## RegisterHooks
-```c++
-RegisterHooks(scriptscope)
-```
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>RegisterHooks</b></span><span class="p">(</span><span style="color:salmon">scriptscope</span><span class="p">)</span>
+</code></pre>
+</div>
 Register hooks to a script scope.
 
 | Parameter      | Type          | Description  |
@@ -34,9 +34,9 @@ Register hooks to a script scope.
 
 ---
 ## RegisterEntityCreateListener
-```c++
-RegisterEntityCreateListener(classname, scope)
-```
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>RegisterEntityCreateListener</b></span><span class="p">(</span><span style="color:salmon">classname</span><span class="p">,</span> <span style="color:salmon">scope</span><span class="p">)</span>
+</code></pre>
+</div>
 Listens for new entities by classname.
 
 | Parameter      | Type          | Description  |
@@ -48,9 +48,9 @@ Listens for new entities by classname.
 
 ---
 ## RegisterEntityMoveListener
-```c++
-RegisterEntityMoveListener(ent,scope)
-```
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>RegisterEntityMoveListener</b></span><span class="p">(</span><span style="color:salmon">ent</span><span class="p">,</span><span style="color:salmon">scope</span><span class="p">)</span>
+</code></pre>
+</div>
 Listens for a specific entity moving.
 
 | Parameter      | Type          | Description  |
@@ -62,9 +62,9 @@ Listens for a specific entity moving.
 
 ---
 ## ScheduleTask
-```c++
-ScheduleTask(func, time, scope = null)
-```
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>ScheduleTask</b></span><span class="p">(</span><span style="color:salmon">func</span><span class="p">,</span> <span style="color:salmon">time</span><span class="p">,</span> <span style="color:salmon">scope</span> <span class="o">=</span> <span class="n">null</span><span class="p">)</span>
+</code></pre>
+</div>
 Schedules a function to execute at a specific time.
 
 | Parameter      | Type          | Description  |
