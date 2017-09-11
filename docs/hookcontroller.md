@@ -45,3 +45,32 @@ Listens for new entities by classname.
 | scope | table | Scope in which callbacks will be called |
 | | |
 | *return* | boolean | If registering was successful |
+
+---
+## RegisterEntityMoveListener
+```c++
+RegisterEntityMoveListener(ent,scope)
+```
+Listens for a specific entity moving.
+
+| Variable      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| ent | entity |  Entity to listen to |
+| scope | table | Scope in which callbacks will be called |
+| | |
+| *return* | boolean | If registering was successful |
+
+---
+## ScheduleTask
+```c++
+ScheduleTask(func, time, scope = null)
+```
+Schedules a function to execute at a specific time.
+
+| Variable      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| func | function *or* string |  Function to call, if it's a string scope has to not be null |
+| time | integer *or* float | Server time to execute the function |
+| scope | table | Scope in which function will be called (if func is a string) |
+| | |
+| *return* | boolean | If registering was successful |
