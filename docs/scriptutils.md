@@ -2,8 +2,6 @@
 title: ScriptUtils
 ---
 
-<param>kappapride</param>
-
 # Classes
 
 ---
