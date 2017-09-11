@@ -1,4 +1,3 @@
-//test OnPickup and OnDrop
 //make sure the inputs for register functions are correct (correct type, etc)
 //make CallFunction take a player activator parameter
 //make OnEquipped and OnUnequipped for non-custom weapons?
@@ -45,7 +44,7 @@ const ZOOM = 524288
 
 const PRINT_START = "Hook Controller: "
 
-class Player {
+class PlayerInfo {
 	constructor(ent){
 		entity = ent
 	}
@@ -334,20 +333,19 @@ class Task{
 
 local function GetSurvivors()
 {
-	local t = {};
-	local ent = null;
-	local i = -1;
+	local array = []
+	local ent = null
 	while (ent = Entities.FindByClassname(ent, "player"))
 	{
 		if (ent.IsValid())
 		{
 			if (ent.IsSurvivor()){
-				t[++i] <- ent;
+				array.append(ent)
 			}
 		}
 	}
 
-	return t;
+	return array
 }
 
 local function FindCustomOptions(currentTable) // make it so users just call something like this directly?
@@ -673,6 +671,26 @@ local function HandleCallback(scope, weaponmodel, player){ // scope = scope of c
 }
 
 function Think(){
+	foreach(survivor in GetSurvivors()){
+		if(players.len() == 0){
+			players.append(PlayerInfo(survivor))
+		} else {
+			local found = false
+			for(local i=0; i<players.len();i++){
+				if(players[i].GetEntity() != null && players[i].GetEntity().IsValid()){
+					if(survivor.GetPlayerUserId() == players[i].GetEntity().GetPlayerUserId()){
+						found = true
+					}
+				} else {
+					players.remove(i)
+					i -= 1
+				}
+			}
+			if(!found){
+				players.append(PlayerInfo(survivor))
+			}
+		}
+	}
 	foreach(task in tasks){
 		if(Time() >= task.GetEndTime()){
 			if(task.GetScope() == null){ // if we're calling a function directly
@@ -709,11 +727,6 @@ function Think(){
 	}
 	foreach(script in hook_scripts){
 		CallFunction(script,"OnTick",null)
-	}
-	if(players.len() == 0){
-		foreach(survivor in GetSurvivors()){
-			players.append(Player(survivor))
-		}
 	}
 	foreach(player in players){
 		if(player != null){
