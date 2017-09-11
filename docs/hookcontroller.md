@@ -2,6 +2,10 @@
 title: HookController
 ---
 
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">RegisterHooks</span><span class="p">(</span><span class="n">scriptscope</span><span class="p">)</span>
+</code></pre>
+</div>
+
 # Functions
 
 ## RegisterCustomWeapon
