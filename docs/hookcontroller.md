@@ -19,6 +19,45 @@ Register a custom weapon and include the weapon script.
 | | |
 | *return* | boolean | If registering was successful |
 
+### Callback Functions
+**These functions must have the same parameter names or they will not be called or an error will be thrown**
+
+**List of key names**:
+* Attack
+* Attack2
+* Crouch
+* Left
+* Right
+* Forward
+* Backward
+* Use
+* Reload
+* Walk
+* Zoom
+* Jump
+
+#### OnKeyPressX_Y
+
+```c++
+OnKeyPressX_Y(ent, player)
+```
+*OR*
+```c++
+OnKeyPressX_Y(ent)
+```
+*OR*
+```c++
+OnKeyPressX_Y()
+```
+**X** can be `Start`, `Tick`, or `End`
+Called when a custom weapon is held and **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed, depending on **X**.
+
+| Parameter      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| ent | entity | Entity handle of that custom weapon |
+| player | entity | Player that pressed the key |
+
+
 ---
 ## RegisterHooks
 <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n"><b>RegisterHooks</b></span><span class="p">(</span><span style="color:salmon">scriptscope</span><span class="p">)</span>
