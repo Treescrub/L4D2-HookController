@@ -2,17 +2,13 @@
 title: HookController
 ---
 
-<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">RegisterHooks</span><span class="p">(</span><span style="color:red">scriptscope</span><span class="p">)</span>
-</code></pre>
-</div>
-
 # Functions
 
 ## RegisterCustomWeapon
 
-```c++
-RegisterCustomWeapon(viewmodel, worldmodel, script)
-```
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span style="color:blue">RegisterCustomWeapon</span><span class="p">(</span><span style="color:red">viewmodel</span><span class="p">,</span> <span style="color:red">worldmodel</span><span class="p">,</span> <span style="color:red">script</span><span class="p">)</span>
+</code></pre>
+</div>
 Register a custom weapon and include the weapon script.
 
 | Parameter      | Type          | Description  |
