@@ -3,7 +3,7 @@
     <title>Kappa</title>
   </head>
 
-# Classes
+<h1>Classes</h1>
 
 ---
 
