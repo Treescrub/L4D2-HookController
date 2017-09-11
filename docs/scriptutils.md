@@ -15,11 +15,11 @@ title: ScriptUtils
 ```c++
 GetHookController()
 ```
-  Returns the scope of a [HookController](hookcontroller.md) module.
+Returns the scope of a [HookController](hookcontroller.md) module.
 ```c++
 GetPlayerUtilities()
 ```
-  Returns the scope of a [PlayerUtilities](playerutilities.md) module.
+<tt>Returns the scope of a [PlayerUtilities](playerutilities.md) module.</tt>
 
 # Functions
 
