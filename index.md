@@ -9,6 +9,8 @@ ScriptUtils has many useful features for scripting, the current ones are:
 - [**Player Utilities**](docs/playerutilities.md) \- Functions for CTerrorPlayer entities, mostly functions for NetProp setting.
 - [**NetProp Helper**](docs/netprophelper.md) \- Keeps track of changes in network properties based on commands entered in chat or in a script.
 
+---
+
 # How to Use
 
 Download the [ZIP](https://github.com/Treescrub/ScriptUtils/archive/master.zip) and extract it into your VScripts folder.
