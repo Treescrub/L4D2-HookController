@@ -20,7 +20,7 @@ Register a custom weapon and include the weapon script.
 | *return* | boolean | If registering was successful |
 
 ### Callback Functions
-**These functions must have one of these sets of parameters (ent,player), (ent), or no parameters.**
+**These functions must have one of these sets of parameters: (ent,player), (ent), or no parameters.**
 
 | Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
@@ -89,6 +89,37 @@ Register hooks to a script scope.
 | scriptscope | table      |  Scope in which callbacks will be called |
 | | |
 | *return* | boolean | If registering was successful |
+
+### Callback Functions
+**These functions must have one of these sets of parameters: (ent,player), (ent), or no parameters.**
+
+| Parameter      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| ent | entity | Entity handle of the custom weapon |
+| player | entity | Player that pressed the key, may be null |
+
+**List of key names**:
+* Attack
+* Attack2
+* Crouch
+* Left
+* Right
+* Forward
+* Backward
+* Use
+* Reload
+* Walk
+* Zoom
+* Jump
+
+#### OnKeyPressX_Y
+
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">OnKeyPress<b>X</b>_<b>Y</b></span><span class="p">()</span>
+</code></pre>
+</div>
+**X** can be `Start`, `Tick`, or `End`
+Called when **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed by a player, depending on **X**.
+
 
 ---
 ## RegisterEntityCreateListener
