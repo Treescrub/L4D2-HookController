@@ -11,7 +11,7 @@ RegisterCustomWeapon(viewmodel, worldmodel, script)
 ```
 Register a custom weapon and include the weapon script.
 
-| Variable      | Type          | Description  |
+| Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
 | viewmodel     | string        | Full path of the custom weapon's viewmodel |
 | worldmodel    | string        | Full path of the custom weapon's worldmodel |
@@ -26,7 +26,7 @@ RegisterHooks(scriptscope)
 ```
 Register hooks to a script scope.
 
-| Variable      | Type          | Description  |
+| Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
 | scriptscope | table      |  Scope in which callbacks will be called |
 | | |
@@ -39,7 +39,7 @@ RegisterEntityCreateListener(classname, scope)
 ```
 Listens for new entities by classname.
 
-| Variable      | Type          | Description  |
+| Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
 | classname | string |  Classname of the entity |
 | scope | table | Scope in which callbacks will be called |
@@ -53,7 +53,7 @@ RegisterEntityMoveListener(ent,scope)
 ```
 Listens for a specific entity moving.
 
-| Variable      | Type          | Description  |
+| Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
 | ent | entity |  Entity to listen to |
 | scope | table | Scope in which callbacks will be called |
@@ -67,7 +67,7 @@ ScheduleTask(func, time, scope = null)
 ```
 Schedules a function to execute at a specific time.
 
-| Variable      | Type          | Description  |
+| Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
 | func | function *or* string |  Function to call, if it's a string scope has to not be null |
 | time | integer *or* float | Server time to execute the function |
