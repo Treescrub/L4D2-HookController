@@ -46,6 +46,7 @@ Register a custom weapon and include the weapon script.
 <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">OnKeyPress<b>X</b>_<b>Y</b></span><span class="p">()</span>
 </code></pre>
 </div>
+
 **X** can be `Start`, `Tick`, or `End`
 Called when a custom weapon entity is held and **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed, depending on **X**.
 
@@ -117,6 +118,7 @@ Register hooks to a script scope.
 <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">OnKeyPress<b>X</b>_<b>Y</b></span><span class="p">()</span>
 </code></pre>
 </div>
+
 **X** can be `Start`, `Tick`, or `End`
 Called when **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed by a player, depending on **X**.
 
