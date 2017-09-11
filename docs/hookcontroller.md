@@ -20,7 +20,12 @@ Register a custom weapon and include the weapon script.
 | *return* | boolean | If registering was successful |
 
 ### Callback Functions
-**These functions must have the same parameter names or they will not be called or an error will be thrown**
+**These functions must have one of these sets of parameters (ent,player), (ent), or no parameters**
+
+| Parameter      | Type          | Description  |
+| :-----------: |:-------------:| :-----------:|
+| ent | entity | Entity handle of the custom weapon |
+| player | entity | Player that pressed the key, may be null |
 
 **List of key names**:
 * Attack
@@ -39,24 +44,38 @@ Register a custom weapon and include the weapon script.
 #### OnKeyPressX_Y
 
 ```c++
-OnKeyPressX_Y(ent, player)
-```
-*OR*
-```c++
-OnKeyPressX_Y(ent)
-```
-*OR*
-```c++
 OnKeyPressX_Y()
 ```
 **X** can be `Start`, `Tick`, or `End`
-Called when a custom weapon is held and **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed, depending on **X**.
+Called when a custom weapon entity is held and **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed, depending on **X**.
 
-| Parameter      | Type          | Description  |
-| :-----------: |:-------------:| :-----------:|
-| ent | entity | Entity handle of that custom weapon |
-| player | entity | Player that pressed the key |
+#### OnUnequipped
 
+```c++
+OnUnequipped()
+```
+Called when a custom weapon entity changes from being held to no longer being held.
+
+#### OnEquipped
+
+```c++
+OnEquipped()
+```
+Called when a custom weapon entity changes from not being held to being held.
+
+#### OnDrop
+
+```c++
+OnDrop()
+```
+Called when a custom weapon entity is dropped by a player.
+
+#### OnPickup
+
+```c++
+OnPickup()
+```
+Called when a custom weapon entity is picked up by a player.
 
 ---
 ## RegisterHooks
