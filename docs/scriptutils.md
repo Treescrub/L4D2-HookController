@@ -1,3 +1,7 @@
+---
+title: ScriptUtils
+---
+
 # Classes
 
 ## Utilities
