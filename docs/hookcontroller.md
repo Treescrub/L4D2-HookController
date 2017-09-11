@@ -20,7 +20,7 @@ Register a custom weapon and include the weapon script.
 | *return* | boolean | If registering was successful |
 
 ### Callback Functions
-**These functions must have one of these sets of parameters (ent,player), (ent), or no parameters**
+**These functions must have one of these sets of parameters (ent,player), (ent), or no parameters.**
 
 | Parameter      | Type          | Description  |
 | :-----------: |:-------------:| :-----------:|
@@ -43,9 +43,9 @@ Register a custom weapon and include the weapon script.
 
 #### OnKeyPressX_Y
 
-```c++
-OnKeyPressX_Y()
-```
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">OnKeyPress<b>X</b>_<b>Y</b></span><span class="p">()</span>
+</code></pre>
+</div>
 **X** can be `Start`, `Tick`, or `End`
 Called when a custom weapon entity is held and **Y** (the key name) starts being pressed, every tick while being pressed, or stopped being pressed, depending on **X**.
 
