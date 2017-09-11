@@ -1,6 +1,7 @@
----
-title: ScriptUtils
----
+<html>
+  <head>
+    <title>Kappa</title>
+  </head>
 
 # Classes
 
@@ -19,7 +20,7 @@ Returns the scope of a [HookController](hookcontroller.md) module.
 ```c++
 GetPlayerUtilities()
 ```
-<tt>Returns the scope of a [PlayerUtilities](playerutilities.md) module.</tt>
+Returns the scope of a [PlayerUtilities](playerutilities.md) module.
 
 # Functions
 
@@ -55,3 +56,4 @@ local playerutils = SetupUtilities("HookController","PlayerUtilities").GetPlayer
 
 
 
+</html>
