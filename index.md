@@ -26,5 +26,9 @@ SetupUtilities()
 This will return a table of the module scopes.
 Find documentation for SetupUtilities [here](docs/scriptutils.md#SetupUtilities).
 
+# Documentation
+
+You can find the documentation [here](docs/index.md)
+
 # Examples
 
