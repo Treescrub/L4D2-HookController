@@ -61,8 +61,8 @@ function SetNoclipping(player,bool){
 
 function ToggleNoclipping(player){
 	if(IsPlayer(player)){
-		local val = NetProps.GetPropInt(player,"movetype")
-		if(val != 8){
+		local movetype = NetProps.GetPropInt(player,"movetype")
+		if(movetype != 8){
 			NetProps.SetPropInt( player, "movetype", 8)
 		} else {
 			NetProps.SetPropInt( player, "movetype", 2)
@@ -70,3 +70,24 @@ function ToggleNoclipping(player){
 	}
 }
 
+function ResetFallDamage(player){
+	if(IsPlayer(player)){
+		NetProps.SetPropFloat(player,"m_Local.m_flFallVelocity",0)
+	}
+}
+
+function ToggleMiscHud(player){
+	if(IsPlayer(player)){
+		if(NetProps.GetPropInt(player,"m_Local.m_iHideHUD") & 64 == 64){
+			NetProps.SetPropInt(player,"m_Local.m_iHideHUD",NetProps.GetPropInt(player,"m_Local.m_iHideHUD") & ~64)
+		} else {
+			NetProps.SetPropInt(player,"m_Local.m_iHideHUD",NetProps.GetPropInt(player,"m_Local.m_iHideHUD") | 64)
+		}
+	}
+}
+
+function SetCurrentWeaponAmmo(clip, ){
+	
+}
+
+// do some stuff with setting ammo

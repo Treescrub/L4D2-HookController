@@ -50,7 +50,8 @@ const PRINT_START = "Scripting Utilities: "
 				foreach(string in vargv){
 					if(typeof(string) == "string"){
 						if(string.tolower() == "hookcontroller"){
-							if(IncludeScript("Utilities/HookController.nut",ScriptUtils.HookController)){
+							local included = IncludeScript("Utilities/HookController.nut",ScriptUtils.HookController)
+							if(included){
 								utils.SetHookController(ScriptUtils.HookController)
 							} else {
 								utils.SetHookController(null)
@@ -58,7 +59,8 @@ const PRINT_START = "Scripting Utilities: "
 							}
 						}
 						if(string.tolower() == "playerutilities"){
-							if(IncludeScript("Utilities/PlayerUtilities.nut",ScriptUtils.PlayerUtilities)){
+							local included = IncludeScript("Utilities/PlayerUtilities.nut",ScriptUtils.PlayerUtilities)
+							if(included){
 								utils.SetPlayerUtilities(ScriptUtils.PlayerUtilities)
 							} else {
 								utils.SetPlayerUtilities(null)
@@ -66,7 +68,8 @@ const PRINT_START = "Scripting Utilities: "
 							}
 						}
 						if(string.tolower() == "netprophelper"){
-							if(IncludeScript("Utilities/NetPropHelper.nut",ScriptUtils.NetPropHelper)){
+							local included = IncludeScript("Utilities/NetPropHelper.nut",ScriptUtils.NetPropHelper)
+							if(included){
 								utils.SetNetPropHelper(ScriptUtils.NetPropHelper)
 							} else {
 								utils.SetNetPropHelper(null)
@@ -86,21 +89,24 @@ const PRINT_START = "Scripting Utilities: "
 			}
 		} else {
 			local utils = Utilities()
-			if(IncludeScript("Utilities/HookController.nut",ScriptUtils.HookController)){
+			local included = IncludeScript("Utilities/HookController.nut",ScriptUtils.HookController)
+			if(included){
 				utils.SetHookController(ScriptUtils.HookController)
 			} else {
 				utils.SetHookController(null)
 				printl(PRINT_START + "Could not include Hook Controller (Check that you have HookController.nut in the Utilities folder)")
 			}
 			
-			if(IncludeScript("Utilities/PlayerUtilities.nut",ScriptUtils.PlayerUtilities)){
+			included = IncludeScript("Utilities/PlayerUtilities.nut",ScriptUtils.PlayerUtilities)
+			if(included){
 				utils.SetPlayerUtilities(ScriptUtils.PlayerUtilities)
 			} else {
 				utils.SetPlayerUtilities(null)
 				printl(PRINT_START + "Could not include Player Utilities (Check that you have PlayerUtilities.nut in the Utilities folder)")
 			}
 			
-			if(IncludeScript("Utilities/NetPropHelper.nut",ScriptUtils.NetPropHelper)){
+			included = IncludeScript("Utilities/NetPropHelper.nut",ScriptUtils.NetPropHelper)
+			if(included){
 				utils.SetNetPropHelper(ScriptUtils.NetPropHelper)
 			} else {
 				utils.SetNetPropHelper(null)
