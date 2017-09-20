@@ -4,6 +4,13 @@ title: HookController
 
 # Functions
 
+## Start
+
+```c++
+Start()
+```
+Call to start listening.
+
 ## RegisterCustomWeapon
 
 <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="p"><b>RegisterCustomWeapon</b></span><span class="p">(</span><span style="color:salmon">viewmodel</span><span class="p">,</span> <span style="color:salmon">worldmodel</span><span class="p">,</span> <span style="color:salmon">script</span><span class="p">)</span>
