@@ -1,34 +1,31 @@
 ---
-title: ScriptUtils
+title: HookController
 ---
 
 # Features
-ScriptUtils has many useful features for scripting, the current ones are:
+[**Hook Controller**](docs/hookcontroller.md) has many useful features for scripting:
 
-- [**Hook Controller**](docs/hookcontroller.md) \- Can register custom weapons, schedule tasks, and listen for entities being created.
-- [**Player Utilities**](docs/playerutilities.md) \- Functions for CTerrorPlayer entities, mostly functions for NetProp setting.
-- [**NetProp Helper**](docs/netprophelper.md) \- Keeps track of changes in network properties based on commands entered in chat or in a script.
+- Register custom weapons
+- Schedule tasks
+- Listen for entity creation
+- And more
 
 ---
 
 # How to Use
 
-Download the [ZIP](https://github.com/Treescrub/ScriptUtils/archive/master.zip) and extract it into your VScripts folder.
+Download the [ZIP](https://github.com/Treescrub/L4D2-HookController/archive/master.zip) and extract it into your VScripts folder.
 
-Then include the script.
+To use in a script, include HookController in a scope.
 ```c++
-IncludeScript("ScriptUtils")
+local controller = {}
+IncludeScript("HookController", controller)
 ```
-To set up modules and get handles.
-```c++
-SetupUtilities()
-```
-This will return a table of the module scopes.
-Find documentation for SetupUtilities [here](docs/scriptutils.md#SetupUtilities).
+Then, register any hooks you want.
+
+You must also call the Start function for hooks to be called.
+
 
 # Documentation
 
 You can find the documentation [here](docs/index.md)
-
-# Examples
-
