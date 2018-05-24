@@ -2,6 +2,8 @@
 //make OnEquipped and OnUnequipped for non-custom weapons?
 //make more options
 //more listeners somehow?
+//register chat command function
+//rework ScheduleTask to take function, arguments table, and time
 
 /*options
 fire custom weapon while restricted (default is off)
@@ -17,6 +19,7 @@ local ent_move_listeners = []
 local ent_create_listeners = []
 local players = []
 local tasks = []
+local chat_commands = []
 
 // options
 local debugprint = true
@@ -52,9 +55,32 @@ const SHOWSCORES = 65536
 const WALK = 131072
 const ZOOM = 524288
 
+const CHAR_SPACE = 32
+const CHAR_NEWLINE = 10
+
 const PRINT_START = "Hook Controller: "
 
 class PlayerInfo {
+	entity = null
+	disabled = false
+	disabledLast = false
+	attack = false
+	attack2 = false
+	crouch = false
+	forward = false
+	backward = false
+	reload = false
+	left = false
+	right = false
+	use = false
+	showscores = false
+	walk = false
+	zoom = false
+	jump = false
+	
+	lastweapon = null
+	lastweapons = null
+	
 	constructor(ent){
 		entity = ent
 	}
@@ -67,11 +93,17 @@ class PlayerInfo {
 	}
 	
 	
+	
 	function SetDisabled(isDisabled){
+		disabledLast = disabled
 		disabled = isDisabled
 	}
 	function GetDisabled(){
 		return disabled
+	}
+	
+	function GetDisabledLast(){
+		return disabledLast
 	}
 	
 	
@@ -214,28 +246,13 @@ class PlayerInfo {
 	function SetLastWeaponsArray(array){
 		lastweapons = array
 	}
-	
-	entity = null
-	disabled = false
-	attack = false
-	attack2 = false
-	crouch = false
-	forward = false
-	backward = false
-	reload = false
-	left = false
-	right = false
-	use = false
-	showscores = false
-	walk = false
-	zoom = false
-	jump = false
-	
-	lastweapon = null
-	lastweapons = null
 }
 
 class CustomWeapon {
+	viewmodel = null
+	worldmodel = null
+	scope = null
+	
 	constructor(vmodel, wmodel, scriptscope){
 		viewmodel = vmodel
 		worldmodel = wmodel
@@ -253,13 +270,13 @@ class CustomWeapon {
 	function GetScope(){
 		return scope
 	}
-	
-	viewmodel = null
-	worldmodel = null
-	scope = null
 }
 
 class EntityCreateListener {
+	last_entities = []
+	scope = null
+	classname = null
+	
 	constructor(className, scriptscope){
 		classname = className
 		scope = scriptscope
@@ -279,13 +296,13 @@ class EntityCreateListener {
 	function SetLastEntities(array){
 		last_entities = array
 	}
-	
-	last_entities = []
-	scope = null
-	classname = null
 }
 
 class EntityMoveListener {
+	last_position = null
+	entity = null
+	scope = null
+	
 	constructor(ent, scriptscope){
 		entity = ent
 		scope = scriptscope
@@ -307,34 +324,55 @@ class EntityMoveListener {
 	function SetLastPosition(vector){
 		last_position = vector
 	}
-	
-	last_position = null
-	entity = null
-	scope = null
 }
 
-class Task{
-	constructor(callFunction, time, scriptscope){
-		func = callFunction
-		end_time = time
-		scope = scriptscope
+class Task {
+	functionKey = null
+	args = null
+	endTime = null
+	
+	constructor(func, arguments, time){
+		functionKey = UniqueString("TaskFunction")
+		args = arguments
+		args[functionKey] <- func
+		endTime = time
 	}
 	
-	function GetEndTime(){
-		return end_time
+	function CallFunction(){
+		args[functionKey]()
 	}
 	
-	function GetFunction(){
-		return func
+	function ReachedTime(){
+		return Time() >= endTime
+	}
+}
+
+class ChatCommand {
+	inputCommand = false
+	commandString = null
+	commandFunction = null
+	
+	constructor(command, func, isInput){
+		commandString = command
+		commandFunction = func
+		inputCommand = isInput
 	}
 	
-	function GetScope(){
-		return scope
+	function CallFunction(ent, input = null){
+		if(inputCommand){
+			commandFunction(ent, input)
+		} else {
+			commandFunction(ent)
+		}
 	}
 	
-	end_time = null
-	func = null
-	scope = null
+	function GetCommand(){
+		return commandString
+	}
+	
+	function IsInputCommand(){
+		return inputCommand
+	}
 }
 
 
@@ -404,6 +442,12 @@ local function CallFunction(scope,funcName,ent = null,player = null){ // if para
 		} else {
 			scope[funcName]()
 		}
+	}
+}
+
+local function CallInventoryChangeFunction(scope, ent, dropped_weapons, new_weapons){
+	if(scope != null && "OnInventoryChange" in scope && typeof(scope["OnInventoryChange"]) == "function"){
+		scope["OnInventoryChange"](ent, dropped_weapons, new_weapons)
 	}
 }
 
@@ -679,6 +723,9 @@ function Think(){
 	foreach(script in tick_scripts){
 		CallFunction(script,"OnTick")
 	}
+	foreach(weapon in custom_weapons){
+		CallFunction(weapon.GetScope(),"OnTick")
+	}
 	foreach(survivor in GetSurvivors()){
 		if(players.len() == 0){
 			players.append(PlayerInfo(survivor))
@@ -688,6 +735,17 @@ function Think(){
 				if(players[i].GetEntity() != null && players[i].GetEntity().IsValid()){
 					if(survivor.GetPlayerUserId() == players[i].GetEntity().GetPlayerUserId()){
 						found = true
+					}
+					
+					if(players[i].GetDisabledLast() && !players[i].GetDisabled()){
+						foreach(weapon in custom_weapons){
+							CallFunction(weapon.GetScope(), "OnReleased", players[i].GetEntity().GetActiveWeapon(), players[i].GetEntity())
+						}
+					}
+					if(!players[i].GetDisabledLast() && players[i].GetDisabled()){
+						foreach(weapon in custom_weapons){
+							CallFunction(weapon.GetScope(), "OnRestricted", players[i].GetEntity().GetActiveWeapon(), players[i].GetEntity())
+						}
 					}
 				} else {
 					players.remove(i)
@@ -700,12 +758,8 @@ function Think(){
 		}
 	}
 	for(local i=0;i<tasks.len();i+=1){
-		if(Time() >= tasks[i].GetEndTime()){
-			if(tasks[i].GetScope() == null){ // if we're calling a function directly
-				tasks[i].GetFunction()()
-			} else {
-				CallFunction(tasks[i].GetScope(),tasks[i].GetFunction())
-			}
+		if(tasks[i].ReachedTime()){
+			tasks[i].CallFunction()
 			tasks.remove(i)
 			i -= 1
 		}
@@ -728,13 +782,12 @@ function Think(){
 			ent_array.sort(@(a,b) a.GetEntityIndex() <=> b.GetEntityIndex())
 			local new_ents = ent_array.slice(listener.GetLastEntities().len())
 			foreach(new_ent in new_ents){
-				printl("OnEntCreate_"+listener.GetClassname())
 				CallFunction(listener.GetScope(),"OnEntCreate_"+listener.GetClassname(),new_ent)
 			}
 		}
 		listener.SetLastEntities(ent_array)
 	}
-	if(custom_weapons.len() > 0){
+	if(custom_weapons.len() > 0 || hook_scripts.len() > 0){
 		foreach(player in players){
 			if(player != null){
 				if(!player.GetEntity().IsValid() || player.GetEntity().IsDead()){
@@ -743,10 +796,10 @@ function Think(){
 					local weaponmodel = NetProps.GetPropString(player.GetActiveWeapon(), "m_ModelName")
 					local custom_weapon = FindCustomWeapon(weaponmodel)
 					if(custom_weapon != null){
-						HandleCallback(custom_weapon.GetScope(),weaponmodel,player)
+						HandleCallback(custom_weapon.GetScope(), weaponmodel, player)
 						player.SetLastWeapon(player.GetEntity().GetActiveWeapon())
 					} else {
-						HandleCallback(null,weaponmodel,player)
+						HandleCallback(null,weaponmodel, player)
 						player.SetLastWeapon(player.GetEntity().GetActiveWeapon())
 					}
 					
@@ -807,26 +860,16 @@ function Think(){
 						}
 					}
 
+					if(new_weapons.len() > 0 || dropped_weapons.len() > 0){
+						foreach(scope in hook_scripts){
+							CallInventoryChangeFunction(scope, player.GetEntity(), dropped_weapons, new_weapons)
+						}
+					}
+					
 					player.SetLastWeaponsArray(current_weapons)
 				}
 			}
 		}
-	}
-}
-
-function SetOptions(table){
-	if(table != null){
-		foreach(key, value in table){
-			if(key.tolower() == "debugprint"){
-				if(value == 0){
-					debugprint = false
-				} else if(value == false){
-					debugprint = false
-				}
-			}
-		}
-	} else {
-		printl(PRINT_START + "Could not set options (Table is null)")
 	}
 }
 
@@ -854,7 +897,7 @@ function RegisterCustomWeapon(viewmodel, worldmodel, script){
 			if(debugprint){
 				printl(PRINT_START + "Registered custom weapon script " + script)
 			}
-			return true
+			return script_scope
 		} else {
 			if(debugprint){
 				printl(PRINT_START + failed + "(Viewmodel or worldmodel is not a string)")
@@ -925,37 +968,17 @@ function RegisterEntityMoveListener(ent,scope){
 	}
 }
 
-function ScheduleTask(func, time, scope = null){ // can only check every 33 milliseconds so be careful
+function ScheduleTask(func, args, time){ // can only check every 33 milliseconds so be careful
 	local failed = "Failed to schedule a task "
 	if(func != null && time != null){
 		if(typeof(time) == "integer" || typeof(time) == "float"){
 			if(time > 0){
 				if(typeof(func) == "function"){
-					tasks.append(Task(func,Time()+time,scope))
+					tasks.append(Task(func, args, Time()+time))
 					if(debugprint){
 						printl(PRINT_START + "Registered a task to execute at " + (Time()+time))
 					}
 					return true
-				} else if(typeof(func) == "string") {
-					if(scope != null){
-						if(typeof(scope) == "table"){
-							tasks.append(Task(func,Time()+time,scope))
-							if(debugprint){
-								printl(PRINT_START + "Registered a task to execute at " + (Time()+time))
-							}
-							return true
-						} else {
-							if(debugprint){
-								printl(PRINT_START + failed + "(Scope has to be a table)")
-							}
-							return false
-						}
-					} else {
-						if(debugprint){
-							printl(PRINT_START + failed + "(Cannot call a function name without a scope)")
-						}
-						return false
-					}
 				}
 			} else {
 				if(debugprint){
@@ -1066,4 +1089,76 @@ function PlayerReleased(playerId){
 		player.SetDisabled(false)
 	}
 }
+
+
+local function IsCommand(msg,ent,command){
+	local message = ""
+	local found_start = false
+	local found_end = false
+	local last_char = 0
+	foreach(char in msg){
+		if(char != CHAR_SPACE && char != CHAR_NEWLINE){
+			if(!found_start){
+				found_start = true
+			}
+			message += char.tochar()
+		} else if(char == CHAR_SPACE){
+			if(last_char != CHAR_SPACE){
+				found_end = true
+			}
+			if(found_start && !found_end){
+				message += char.tochar()
+			}
+		}
+	}
+	return message == command
+}
+
+local function GetInputCommand(msg,ent,command){
+	local message = ""
+	local found_start = false
+	local found_end = false
+	local last_char = 0
+	local index = 0
+	foreach(char in msg){
+		if(char != CHAR_SPACE && char != CHAR_NEWLINE){
+			if(!found_start){
+				found_start = true
+			}
+			message += char.tochar()
+		} else if(char == CHAR_SPACE){
+			if(last_char != CHAR_SPACE){
+				found_end = true
+				if(message != command || index == msg.len() - 1){
+					return false
+				}
+				return msg.slice(index + 1, msg.len()-1)
+			}
+			if(found_start && !found_end){
+				message += char.tochar()
+			}
+		}
+		index += 1
+	}
+	return false
+}
+
+function OnGameEvent_player_say(params){
+	local text = params["text"]
+	local ent = GetPlayerFromUserID(params["userid"])
+	
+	foreach(command in chat_commands){ 
+		if(command.IsInputCommand()){
+			local input = GetInputCommand(text, ent, command.GetCommand())
+			if(input != false){
+				command.CallFunction(ent, input)
+			}
+		} else {
+			if(IsCommand(text, ent, command.GetCommand())){
+				command.CallFunction(ent)
+			}
+		}
+	}
+}
+
 __CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
