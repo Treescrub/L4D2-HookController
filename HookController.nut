@@ -1,4 +1,4 @@
-/*
+/* Copyright notice
  * Copyright (c) 2019 Daroot Leafstorm
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -21,7 +21,7 @@
 */
 
 
-/*
+/* Ideas
 	make OnEquipped and OnUnequipped for non-custom weapons?
 	make hooked functions use tables? (like VSLib)
 	use multiple timers to reduce long hangs?
@@ -29,13 +29,17 @@
 	migrate to using EntFire?
 */
 
-/*options
+/* Options
 fire custom weapon while restricted (default is off)
 print debug info (default is on)
 */
 
 /* Changelog
-	v1.0 - 8/10/19
+	v1.0.1 - 8/10/19
+		Added SetPlayerAngles
+		Made chat commands case insensitive
+		Fixed input commands not being recognized
+	v1.0.0 - 8/10/19
 		Added checks to stop duplicate calls to hooks
 */
 
@@ -275,6 +279,11 @@ function SendCommandToClient(entity client, string command) - Sends the command 
 		client - client to send command to
 		command - command to send to client's console
 		
+function SetPlayerAngles(entity player, qangle angles) - Sets the players' view angles
+	arguments:
+		player - player to set view angles of
+		angles - angles to set the player's view to
+
 function PlayerGenerator() - Generator function that returns players
 	returns: entity player
 	
@@ -376,6 +385,13 @@ Characters <- {
 	NEWLINE = "\n"
 	TAB = "\t"
 	RETURN = "\r"
+}
+
+CharacterCodes <- {
+	SPACE = 32
+	NEWLINE = 10
+	TAB = 9
+	RETURN = 13
 }
 
 Flags <- {
@@ -6164,6 +6180,19 @@ function SendCommandToClient(client, command){
 	return false
 }
 
+/**
+ * Sets the specified players' angles
+ */
+function SetPlayerAngles(player, angles){
+	local prevPlayerName = player.GetName()
+	local playerName = UniqueString()
+	NetProps.SetPropString(player, "m_iName", playerName)
+	local teleportEntity = SpawnEntityFromTable("point_teleport", {origin = GetOrigin(), angles = angles.ToKVString(), target = playerName, targetname = UniqueString()})
+	DoEntFire("!self", "Teleport", "", 0, null, teleportEntity)
+	DoEntFire("!self", "Kill", "", 0, null, teleportEntity)
+	DoEntFire("!self", "AddOutput", "targetname " + prevPlayerName, 0.01, null, this)
+}
+
 
 function PlayerGenerator(){
 	local ent = null
@@ -6454,17 +6483,12 @@ local function IsCommand(msg, command){
 	local message = ""
 	local found_start = false
 	local found_end = false
-	local last_char = 0
 	foreach(char in msg){
-		if(char != Characters.SPACE && char != Characters.NEWLINE){
-			if(!found_start){
-				found_start = true
-			}
-			message += char.tochar()
-		} else if(char == Characters.SPACE){
-			if(last_char != Characters.SPACE){
-				found_end = true
-			}
+		if(char != CharacterCodes.SPACE && char != CharacterCodes.NEWLINE){
+			found_start = true
+			message += char.tochar().tolower()
+		} else if(char == CharacterCodes.SPACE){
+			found_end = true
 			if(found_start && !found_end){
 				message += char.tochar()
 			}
@@ -6480,25 +6504,17 @@ local function GetInputCommand(msg, command){
 	local message = ""
 	local found_start = false
 	local found_end = false
-	local last_char = 0
 	local index = 0
 	foreach(char in msg){
-		if(char != Characters.SPACE && char != Characters.NEWLINE){
-			if(!found_start){
-				found_start = true
+		if(char != CharacterCodes.SPACE && char != CharacterCodes.NEWLINE){
+			found_start = true
+			message += char.tochar().tolower()
+		} else if(char == CharacterCodes.SPACE){
+			found_end = true
+			if(message != command || index == msg.len() - 1){
+				return false
 			}
-			message += char.tochar()
-		} else if(char == Characters.SPACE){
-			if(last_char != Characters.SPACE){
-				found_end = true
-				if(message != command || index == msg.len() - 1){
-					return false
-				}
-				return msg.slice(index + 1, msg.len())
-			}
-			if(found_start && !found_end){
-				message += char.tochar()
-			}
+			return msg.slice(index + 1, msg.len())
 		}
 		index += 1
 	}
