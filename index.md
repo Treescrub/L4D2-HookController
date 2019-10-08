@@ -6,25 +6,27 @@ title: HookController
 [**Hook Controller**](docs/hookcontroller.md) has many useful features for scripting:
 
 - Register custom weapons
-- Schedule tasks
+- Register a function to be executed every server tick
+- Register chat commands
+- Register throwable explode hooks
+- Schedule tasks to be executed after the given time
 - Listen for entity creation
-- And more
+- Can add many extra methods to entities
+- Set a player's view angles
+- and more...
 
 ---
 
 # How to Use
 
-Download the [ZIP](https://github.com/Treescrub/L4D2-HookController/archive/master.zip) and extract it into your VScripts folder.
+Download the [ZIP](https://github.com/Treescrub/L4D2-HookController/archive/master.zip) and extract HookController.nut to your VScripts folder.
 
-To use in a script, include HookController in a scope.
-```c++
-local controller = {}
-IncludeScript("HookController", controller)
+To use in a script, include HookController in a table.
+```javascript
+HookController <- {}
+IncludeScript("HookController", HookController)
 ```
 Then, register any hooks you want.
-
-You must also call the Start function for hooks to be called.
-
 
 # Documentation
 
