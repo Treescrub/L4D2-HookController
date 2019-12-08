@@ -35,6 +35,12 @@ print debug info (default is on)
 */
 
 /* Changelog
+	v1.0.3 - 29/11/19
+		Added ServerInfo class and GetServerInfo function
+		Fixed SetTimescale
+		Fixed OnKeyPress hooks
+	v1.0.2 - 23/10/19
+		Added UpgradedAmmoLoaded and Upgrades to the Improved Methods
 	v1.0.1 - 8/10/19
 		Added SetPlayerAngles
 		Made chat commands case insensitive
@@ -124,7 +130,9 @@ function RegisterHooks(table scriptScope) - Registers various misc hooks
 	calls:
 		OnTick() - called every tick
 		OnInventoryChange(entity player, array droppedWeapons, array newWeapons) - called when a player's inventory changes
-		OnKeyPressStart_key(entity player, entity weapon) and OnKeyPressTick_key(entity player, entity weapon) and OnKeyPressEnd_key(entity player, entity weapon)
+		OnKeyPressStart_key(entity player, entity weapon)
+		OnKeyPressTick_key(entity player, entity weapon)
+		OnKeyPressEnd_key(entity player, entity weapon)
 			keys:
 				Attack
 				Jump
@@ -768,6 +776,72 @@ class PlayerInfo {
 	}
 }
 
+class ServerInfo {
+	constructor(hostname, address, port, game, mapname, maxplayers, os, dedicated, password, vanilla){
+		this.hostname = hostname
+		this.address = address
+		this.port = port
+		this.game = game
+		this.mapname = mapname
+		this.maxplayers = maxplayers
+		this.os = os
+		this.dedicated = dedicated
+		this.password = password
+		this.vanilla = vanilla
+	}
+	
+	function GetHostName(){
+		return hostname
+	}
+	
+	function GetAddress(){
+		return address
+	}
+	
+	function GetPort(){
+		return port
+	}
+	
+	function GetGame(){
+		return game
+	}
+	
+	function GetMapName(){
+		return mapname
+	}
+	
+	function GetMaxPlayers(){
+		return maxplayers
+	}
+	
+	function GetOS(){
+		return os
+	}
+	
+	function IsDedicated(){
+		return dedicated
+	}
+	
+	function HasPassword(){
+		return password
+	}
+	
+	function IsVanilla(){
+		return vanilla
+	}
+	
+	hostname = null
+	address = null
+	port = null
+	game = null
+	mapname = null
+	maxplayers = null
+	os = null
+	dedicated = null
+	password = null
+	vanilla = null
+}
+
 class CustomWeapon {
 	viewmodel = null
 	worldmodel = null
@@ -1161,10 +1235,10 @@ local clientCommand = SpawnEntityFromTable("point_clientcommand", {})
 
 local improvedMethodsStarted = false
 local improvedMethodsFinished = false
-
+local serverInfo = null
 
 // This initializes the timer responsible for the calls to the Think function
-local timer = SpawnEntityFromTable("logic_timer", {RefireTime = 0.01})
+local timer = SpawnEntityFromTable("logic_timer", {RefireTime = 0})
 timer.ValidateScriptScope()
 timer.GetScriptScope()["scope"] <- this
 timer.GetScriptScope()["func"] <- function(){
@@ -1337,22 +1411,22 @@ local function CallInventoryChangeFunction(scope, ent, droppedWeapons, newWeapon
 local function CallKeyPressFunctions(player, scope, keyId, keyName){
 	if(player.GetEntity().GetButtonMask() & keyId){
 		if(player.GetHeldButtonsMask() & keyId){
-			foreach(script in hookScripts){
+			/*foreach(script in hookScripts){
 				CallFunction(script, "OnKeyPressTick_" + keyName, player.GetEntity().GetActiveWeapon(), player.GetEntity())
-			}
+			}*/
 			CallFunction(scope, "OnKeyPressTick_" + keyName, player.GetEntity().GetActiveWeapon(), player.GetEntity())
 		} else {
 			player.SetHeldButtonsMask(player.GetHeldButtonsMask() | keyId)
-			foreach(script in hookScripts){
+			/*foreach(script in hookScripts){
 				CallFunction(script, "OnKeyPressStart_" + keyName, player.GetEntity().GetActiveWeapon(), player.GetEntity())
-			}
+			}*/
 			CallFunction(scope, "OnKeyPressStart_" + keyName, player.GetEntity().GetActiveWeapon(), player.GetEntity())
 		}
 	} else if(player.GetHeldButtonsMask() & keyId){
 		player.SetHeldButtonsMask(player.GetHeldButtonsMask() & ~keyId)
-		foreach(script in hookScripts){
+		/*foreach(script in hookScripts){
 			CallFunction(script, "OnKeyPressEnd_" + keyName, player.GetEntity().GetActiveWeapon(), player.GetEntity())
-		}
+		}*/
 		CallFunction(scope, "OnKeyPressEnd_" + keyName, player.GetEntity().GetActiveWeapon(), player.GetEntity())
 	}
 }
@@ -1763,6 +1837,13 @@ function Think(){
 			improvedMethodsFinished = true
 		}
 	}
+}
+
+/**
+ * Returns the ServerInfo class
+ */
+function GetServerInfo(){
+	return serverInfo
 }
 
 function ImprovedMethodsIncluded(){
@@ -3648,9 +3729,6 @@ function IncludeImprovedMethods(){
 
 		CBaseEntity["SetFallSpeed"] <- function(value){SetProp("m_FallSpeed", value.tofloat())}
 		CBaseEntity["GetFallSpeed"] <- function(){return GetProp("m_FallSpeed")}
-			
-		CBaseEntity["SetAlpha"] <- function(value){SetProp("m_iAlpha", value.tointeger())}
-		CBaseEntity["GetAlpha"] <- function(){return GetProp("m_iAlpha")}
 
 
 		CBaseEntity["SetAcceleration"] <- function(value){SetProp("m_acceleration", value.tofloat())}
@@ -5125,6 +5203,12 @@ function IncludeImprovedMethods(){
 		CBaseAnimating["GetClip"] <- function(){return GetPropInt("m_iClip1")}
 		CBaseAnimating["SetReserveAmmo"] <- function(ammo){SetPropInt("m_iExtraPrimaryAmmo", ammo)}
 		CBaseAnimating["GetReserveAmmo"] <- function(){return GetPropInt("m_iExtraPrimaryAmmo")}
+		
+		CBaseAnimating["SetUpgradedAmmoLoaded"] <- function(value){SetProp("m_nUpgradedPrimaryAmmoLoaded", value.tointeger())}
+		CBaseAnimating["GetUpgradedAmmoLoaded"] <- function(){return GetProp("m_nUpgradedPrimaryAmmoLoaded")}
+
+		CBaseAnimating["SetUpgrades"] <- function(value){SetProp("m_upgradeBitVec", value.tointeger())}
+		CBaseAnimating["GetUpgrades"] <- function(){return GetProp("m_upgradeBitVec")}
 	}
 	
 	local func_CTerrorPlayer = function(){
@@ -5750,7 +5834,7 @@ function IncludeImprovedMethods(){
 
 		CTerrorPlayer["PickupObject"] <- function(entity){PickupObject(this, entity)}
 
-		CTerrorPlayer["SetAngles"] <- function(angles){
+		CTerrorPlayer["SetEyeAngles"] <- function(angles){
 			local prevPlayerName = GetName()
 			local playerName = UniqueString()
 			SetName(playerName)
@@ -6160,7 +6244,7 @@ function SetTimescale(timescale, acceleration = 0.05, minBlendRate = 0.1, blendD
 		
 		DoEntFire("!self", "Start", "", 0, null, timescaleEnt)
 		
-		timescaleEnt.Kill()
+		DoEntFire("!self", "Kill", "", 0.001, null, timescaleEnt)
 		return true
 	}
 	return false
@@ -6187,7 +6271,7 @@ function SetPlayerAngles(player, angles){
 	local prevPlayerName = player.GetName()
 	local playerName = UniqueString()
 	NetProps.SetPropString(player, "m_iName", playerName)
-	local teleportEntity = SpawnEntityFromTable("point_teleport", {origin = GetOrigin(), angles = angles.ToKVString(), target = playerName, targetname = UniqueString()})
+	local teleportEntity = SpawnEntityFromTable("point_teleport", {origin = player.GetOrigin(), angles = angles.ToKVString(), target = playerName, targetname = UniqueString()})
 	DoEntFire("!self", "Teleport", "", 0, null, teleportEntity)
 	DoEntFire("!self", "Kill", "", 0, null, teleportEntity)
 	DoEntFire("!self", "AddOutput", "targetname " + prevPlayerName, 0.01, null, this)
@@ -6538,6 +6622,23 @@ function OnGameEvent_player_say(params){
 			}
 		}
 	}
+}
+
+function OnGameEvent_server_spawn(params){
+	/*
+		"hostname"	"string"	// public host name
+		"address"	"string"	// hostame, IP or DNS name	
+		"port"		"short"		// server port
+		"game"		"string"	// game dir 
+		"mapname"	"string"	// map name
+		"maxplayers"	"long"		// max players
+		"os"		"string"	// WIN32, LINUX
+		"dedicated"	"bool"		// true if dedicated server
+		"password"	"bool"		// true if password protected
+		"vanilla"	"bool"		// vanilla server doesn't allow custom content on the clients
+	*/
+	
+	serverInfo = ServerInfo(params.hostname, params.address, params.port, params.game, params.mapname, params.maxplayers, params.os, params.dedicated, params.password, params.vanilla)
 }
 
 __CollectEventCallbacks(this, "OnGameEvent_", "GameEventCallbacks", RegisterScriptGameEventListener)
