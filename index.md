@@ -30,4 +30,4 @@ Then, register any hooks you want.
 
 # Documentation
 
-You can find the documentation [here](docs/index.md)
+You can find the documentation [here](docs/hookcontroller.md)
